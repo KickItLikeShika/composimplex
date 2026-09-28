@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "composimplex"
+version = "0.1.0"
+description = "Composable language-model decoding on the probability simplex."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "torch",
+  "transformers",
+  "PyYAML",
+]
+
+[project.optional-dependencies]
+benchmark = ["datasets", "sympy", "tqdm"]
+ifeval = ["absl-py", "langdetect==1.0.9", "nltk==3.10.3", "immutabledict"]
+vllm = ["vllm"]
+dev = ["pytest"]
+all = ["datasets", "sympy", "tqdm", "vllm", "pytest"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

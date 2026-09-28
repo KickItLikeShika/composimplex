@@ -1,0 +1,46 @@
+model_name: Qwen/Qwen2.5-7B
+benchmark: MATH
+dtype: bfloat16
+
+sampler:
+  temperature: 0.5
+  max_new_tokens: 3072
+  support: {type: topm, value: 200}
+  base_distribution: {type: softmax, temperature: 1.0}
+  lambda: 1.0
+  solver: auto
+  optimizer: {name: mirror_ascent, steps: 10, lr: 0.1, tol: 0.0}
+  chooser: {type: multinomial}
+  regularizers:
+    - {type: kl_to_base, alpha: 0.5}
+    - {type: diversity_gap, alpha: 0.5, K: 16, gap_tau: 1.0}
+
+run:
+  seed: 0
+  num_samples: 16
+  output_dir: results/starter/qwen2.5-7b/math/{backend}
+
+evaluation:
+  metrics:
+    - pass_at_k
+    - sc_at_k
+    - semantic_reasoning_diversity
+    - latency
+    - throughput
+    - completion_tokens
+    - kl_q_p
+    - js_q_p
+    - entropy
+    - topm_coverage
+    - diversity_gap
+
+transformers:
+  max_model_len: 4096
+  batch_size: 16
+
+vllm:
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.9
+  max_model_len: 4096
+  max_num_seqs: 16
+  batch_size: 8
