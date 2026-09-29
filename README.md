@@ -2,7 +2,25 @@
 
 *Composable Decoding on the Probability Simplex: Theory and Implementation*
 
+[![arXiv](https://img.shields.io/badge/arXiv-2609.34992-b31b1b.svg)](https://arxiv.org/abs/2609.34992)
+
 ![CompoSimplex overview](docs/overview.svg)
+
+## About
+
+CompoSimplex treats language-model decoding as an optimization problem. Instead of applying a fixed sampling rule, each generation step solves for the next-token distribution
+
+```math
+q_t^\star = \arg\max_{q \in \Delta(S_t)} \Big[ \langle q, s_t \rangle - \lambda \sum_{i=1}^{m} \alpha_i \, \Omega_i(q) \Big]
+```
+
+where $s_t$ are the model's logits, $S_t$ is the set of candidate tokens, and each $\Omega_i$ is a regularizer that shapes the distribution.
+
+- Greedy, temperature, Top-k and Top-p sampling are all special cases.
+- New decoders are built by mixing regularizers in a YAML config.
+- Works with Hugging Face Transformers and vLLM.
+
+The paper's **Best-of-K** decoder is KL + Coverage (or KL + Diversity).
 
 
 ## Installation
@@ -107,4 +125,18 @@ composimplex/
 │   └── evaluate.py           Saved-output metrics
 ├── docs/overview.svg         Framework diagram
 └── pyproject.toml
+```
+
+## Citation
+
+```bibtex
+@misc{ji2026composabledecodingprobabilitysimplex,
+      title={Composable Decoding on the Probability Simplex: Theory and Implementation}, 
+      author={Xiaotong Ji and Ahmed Khaled Khamis and Rasul Tutunov and Matthieu Zimmer and Haitham Bou-Ammar},
+      year={2026},
+      eprint={2609.34992},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2609.34992}, 
+}
 ```
