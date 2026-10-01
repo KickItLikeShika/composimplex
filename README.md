@@ -1,6 +1,6 @@
 # CompoSimplex
 
-*Composable Decoding on the Probability Simplex: Theory and Implementation*
+The official library of *Composable Decoding on the Probability Simplex: Theory and Implementation*.
 
 [![arXiv](https://img.shields.io/badge/arXiv-2609.34992-b31b1b.svg)](https://arxiv.org/abs/2609.34992)
 
@@ -51,11 +51,12 @@ IFEval dataset also needs `pip install -e '.[ifeval]'`, and LiveCodeBench datase
 | Backend | Transformers or vLLM |
 | Benchmark | MATH500, GPQA Diamond, IFEval, LiveCodeBench v6 |
 
-One starter config is provided for each model:
+Configurations for benchmarks:
 
 | Model | Benchmark | Config |
 | --- | --- | --- |
 | Qwen2.5-7B | MATH500 | [qwen2_5_7b.yaml](benchmark/configs/qwen2_5_7b.yaml) |
+| Qwen2.5-7B (vLLM) | MATH500 | [qwen2_5_7b_vllm.yaml](benchmark/configs/qwen2_5_7b_vllm.yaml) |
 | Qwen3-4B-Base | GPQA Diamond | [qwen3_4b_base.yaml](benchmark/configs/qwen3_4b_base.yaml) |
 | LFM2.5-1.2B-Base | IFEval | [lfm2_5_1_2b_base.yaml](benchmark/configs/lfm2_5_1_2b_base.yaml) |
 | Gemma-4-26B-A4B-IT | LiveCodeBench v6 | [gemma4_26b_a4b_it.yaml](benchmark/configs/gemma4_26b_a4b_it.yaml) |
@@ -118,7 +119,7 @@ composimplex/
 │       ├── transformers.py
 │       └── vllm.py
 ├── benchmark/
-│   ├── configs/              One starter config per model
+│   ├── configs/              Configurations for benchmarks
 │   ├── run.py                Generation and benchmark entry point
 │   ├── grader.py             Correctness and instruction-following graders
 │   ├── utils.py              Data, prompts, and metric aggregation
