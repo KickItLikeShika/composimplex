@@ -344,7 +344,12 @@ def _build_vllm(config: dict[str, Any], seed: int):
             backend_config.get("gpu_memory_utilization", 0.9)
         ),
     }
-    for key in ("max_model_len", "max_num_seqs", "enforce_eager"):
+    for key in (
+        "max_model_len",
+        "max_num_seqs",
+        "enforce_eager",
+        "skip_tokenizer_init",
+    ):
         if key in backend_config:
             kwargs[key] = backend_config[key]
     return LLM(**kwargs)
@@ -376,6 +381,7 @@ def run_vllm(config: dict[str, Any]) -> dict[str, Any]:
     )
     backend_config = config.get("vllm", {})
     batch_size = int(backend_config.get("batch_size", 1))
+    skip_tokenizer_init = bool(backend_config.get("skip_tokenizer_init", False))
     max_model_len = int(backend_config.get("max_model_len", 4096))
     if batch_size < 1:
         raise ValueError("vllm.batch_size must be at least 1.")
@@ -419,6 +425,12 @@ def run_vllm(config: dict[str, Any]) -> dict[str, Any]:
                             },
                             metric_accumulator=metric_accumulator,
                             max_tokens=request_max_tokens,
+                            detokenize=not skip_tokenizer_init,
+                            stop_token_ids=(
+                                sorted(_token_id_set(tokenizer.eos_token_id))
+                                if skip_tokenizer_init
+                                else None
+                            ),
                             n=1,
                             seed=benchmark.sample_seed(sample_index),
                         )
@@ -452,6 +464,11 @@ def run_vllm(config: dict[str, Any]) -> dict[str, Any]:
                 distribution_stats = metric_accumulator.to_dict()
                 generated = request_output.outputs[0]
                 completion_token_ids = list(getattr(generated, "token_ids", []))
+                completion = (
+                    tokenizer.decode(completion_token_ids, skip_special_tokens=True)
+                    if skip_tokenizer_init
+                    else generated.text
+                )
                 actual_prompt_ids = (
                     list(output_prompt_ids)
                     if output_prompt_ids is not None
@@ -460,7 +477,7 @@ def run_vllm(config: dict[str, Any]) -> dict[str, Any]:
                 benchmark.record(
                     task=task,
                     sample_index=sample_index,
-                    completion=generated.text,
+                    completion=completion,
                     prompt_token_ids=actual_prompt_ids,
                     completion_token_ids=completion_token_ids,
                     finish_reason=str(
